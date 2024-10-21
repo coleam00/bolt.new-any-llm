@@ -7,6 +7,7 @@ import type { ActionState } from '~/lib/runtime/action-runner';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { classNames } from '~/utils/classNames';
 import { cubicEasingFn } from '~/utils/easings';
+import { DockerGitActionForm } from '~/components/ui/DockerGitActionForm';
 
 const highlighterOptions = {
   langs: ['shell'],
@@ -171,6 +172,8 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                   <div className="flex items-center w-full min-h-[28px]">
                     <span className="flex-1">Run command</span>
                   </div>
+                ) : type === 'git' ? (
+                  <DockerGitActionForm artifactId={artifactId} />
                 ) : null}
               </div>
               {type === 'shell' && (

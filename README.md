@@ -128,3 +128,98 @@ Here are some tips to get the most out of Bolt.new:
 - **Scaffold the basics first, then add features**: Make sure the basic structure of your application is in place before diving into more advanced functionality. This helps Bolt understand the foundation of your project and ensure everything is wired up right before building out more advanced functionality.
 
 - **Batch simple instructions**: Save time by combining simple instructions into one message. For example, you can ask Bolt to change the color scheme, add mobile responsiveness, and restart the dev server, all in one go saving you time and reducing API credit consumption significantly.
+
+## Running Backend Agents with Docker
+
+Bolt.new now supports running backend agents within Docker containers. This allows for isolated and reproducible environments for your agents.
+
+### **Prerequisites**
+
+- Docker must be installed and running on your development machine.
+- Ensure Docker is accessible to your application (e.g., appropriate permissions).
+
+### **Using Docker Actions**
+
+1. **Create a Docker Action:**
+   - Specify the Docker image you want to use.
+   - Provide the command to run inside the container.
+   - Optionally, add environment variables.
+
+2. **Example:**
+
+   ```json
+   {
+     "type": "docker",
+     "image": "node:14",
+     "command": ["node", "agent.js"],
+     "env": {
+       "API_KEY": "your-api-key"
+     }
+   }
+   ```
+
+3. **Running the Action:**
+   - Use the provided Docker Action Form in the UI to create and submit your Docker action.
+   - The agent will run inside the specified Docker container, and its input/output will be connected to the LLM's prompt and response mechanisms.
+
+### **Important Notes**
+
+- **Resource Management:** Ensure that Docker containers are properly managed to avoid resource leaks. Containers are automatically stopped when actions are completed or aborted.
+- **Security:** Running containers can pose security risks. Ensure that the Docker images you use are from trusted sources and that you handle sensitive information securely.
+
+## Running Backend Agents with Git Integration
+
+Bolt.new now supports Git integration within Docker containers, allowing agents to manage branches and create pull requests seamlessly.
+
+### **Prerequisites**
+
+- Docker must be installed and running on your development machine.
+- Git must be available in the Docker containers (using the custom Docker image `my-node-git:latest`).
+
+### **Using Git Actions**
+
+1. **Create a Git Action:**
+   - **Repository URL:** The HTTPS URL of your GitHub repository.
+   - **Branch Name (Optional):** The name of the branch to create.
+   - **Commit Message (Optional):** The commit message for changes.
+   - **Pull Request Title (Optional):** The title of the pull request.
+   - **Pull Request Body (Optional):** The body description of the pull request.
+   - **GitHub Token:** A Personal Access Token with appropriate permissions.
+
+2. **Example:**
+
+   ```json
+   {
+     "type": "git",
+     "repositoryUrl": "https://github.com/your-username/your-repo.git",
+     "branchName": "feature/new-feature",
+     "commitMessage": "Add new feature",
+     "pullRequestTitle": "Add New Feature",
+     "pullRequestBody": "This pull request adds a new feature.",
+     "token": "your-github-personal-access-token"
+   }
+   ```
+
+3. **Running the Action:**
+   - Use the **Git Action Form** in the UI to input the required details and submit the Git action.
+   - The agent will perform the following:
+     - Clone the specified repository.
+     - Create a new branch (if provided).
+     - Commit changes (if a commit message is provided).
+     - Push the branch to the remote repository.
+     - Create a pull request (if pull request details are provided).
+
+### **Important Notes**
+
+- **Token Security:** For enhanced security, it's recommended to implement OAuth authentication instead of directly using personal access tokens.
+- **Permissions:** Ensure your GitHub token has the necessary permissions to perform repository operations such as cloning, pushing, and creating pull requests.
+- **Error Handling:** Monitor action statuses to ensure Git operations complete successfully. Errors will be reported if any issues occur during the process.
+
+### **Security Considerations**
+
+- **Sensitive Data:** Avoid exposing sensitive information like GitHub tokens. Implement secure authentication mechanisms to protect user credentials.
+- **Repository Access:** Ensure that only authorized agents can perform Git operations on your repositories to maintain code integrity.
+
+### **Contact and Support**
+
+If you encounter any issues or need assistance with Git integration, feel free to open an issue or contact the maintainers for support.

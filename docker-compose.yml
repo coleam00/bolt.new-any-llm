@@ -1,0 +1,23 @@
+services:
+  bolt-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Add any other environment variables your app needs
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      # This volume is for development purposes, allowing live code updates
+      # Comment out or remove for production
+      - .:/app
+      # This volume is to prevent node_modules from being overwritten by the above volume
+      - /app/node_modules
+    command: pnpm run start
+
+volumes:
+  node_modules:

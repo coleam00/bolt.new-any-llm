@@ -8,7 +8,7 @@ This fork of bolt.new allows you to choose the LLM that you use for each prompt!
 
 - ✅ OpenRouter Integration (@coleam00)
 - ✅ Gemini Integration (@jonathands)
-- ✅ Autogenerate Ollama models from what is downloaded (@mosquet)
+- ✅ Autogenerate Ollama models from what is downloaded (@yunatamos)
 - ✅ Filter models by provider (@jasonm23)
 - ✅ Download project as ZIP (@fabwaseem)
 - ⬜ LM Studio Integration

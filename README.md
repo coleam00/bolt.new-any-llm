@@ -11,6 +11,7 @@ This fork of bolt.new allows you to choose the LLM that you use for each prompt!
 - ✅ Autogenerate Ollama models from what is downloaded (@mosquet)
 - ✅ Filter models by provider (@jasonm23)
 - ✅ Download project as ZIP (@fabwaseem)
+- ✅ Improvements to the main Bolt.new prompt in `app\lib\.server\llm\prompts.ts` (@kofi-bhr)
 - ⬜ LM Studio Integration
 - ⬜ DeepSeek API Integration
 - ⬜ Together Integration
@@ -19,7 +20,6 @@ This fork of bolt.new allows you to choose the LLM that you use for each prompt!
 - ⬜ Run agents in the backend instead of a single model call
 - ⬜ Publish projects directly to GitHub
 - ⬜ Load local projects into the app
-- ⬜ Improvements to the main Bolt.new prompt in `app\lib\.server\llm\prompts.ts` (there is definitely opportunity there)
 
 # Bolt.new: AI-Powered Full-Stack Web Development in the Browser
 

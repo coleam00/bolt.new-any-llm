@@ -12,6 +12,7 @@ This fork of bolt.new allows you to choose the LLM that you use for each prompt!
 - ✅ Filter models by provider (@jasonm23)
 - ✅ Download project as ZIP (@fabwaseem)
 - ⬜ LM Studio Integration
+- ⬜ integration with Azure AI Studio Models (base and fine-tuned) 
 - ⬜ DeepSeek API Integration
 - ⬜ Together Integration
 - ⬜ Azure Open AI API Integration

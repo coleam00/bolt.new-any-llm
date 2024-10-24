@@ -41,11 +41,12 @@ export class EditorStore {
             }
 
             const previousDocument = previousDocuments?.[filePath];
+            const fileContent = this.#filesStore.getFile(filePath)?.content;
 
             return [
               filePath,
               {
-                value: dirent.content,
+                value: fileContent ?? dirent.content,
                 filePath,
                 scroll: previousDocument?.scroll,
               },

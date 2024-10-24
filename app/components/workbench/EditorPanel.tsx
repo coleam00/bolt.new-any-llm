@@ -123,27 +123,28 @@ export const EditorPanel = memo(
     };
 
     return (
-      <PanelGroup direction="vertical">
+      <PanelGroup direction="vertical" className="h-full">
         <Panel defaultSize={showTerminal ? DEFAULT_EDITOR_SIZE : 100} minSize={20}>
-          <PanelGroup direction="horizontal">
-            <Panel defaultSize={20} minSize={10} collapsible>
-              <div className="flex flex-col border-r border-bolt-elements-borderColor h-full">
-                <PanelHeader>
-                  <div className="i-ph:tree-structure-duotone shrink-0" />
+          <PanelGroup direction="horizontal" className="h-full">
+            <Panel defaultSize={20} minSize={10} collapsible className="border-r border-bolt-elements-borderColor">
+              <div className="flex flex-col h-full">
+                <PanelHeader className="p-4">
+                  <div className="i-ph:tree-structure-duotone shrink-0 mr-2" />
                   Files
                 </PanelHeader>
                 <FileTree
-                  className="h-full"
+                  className="flex-1 overflow-auto p-2"
                   files={files}
                   hideRoot
                   unsavedFiles={unsavedFiles}
                   rootFolder={WORK_DIR}
                   selectedFile={selectedFile}
                   onFileSelect={onFileSelect}
+                  hoverClassName="hover:bg-bolt-elements-background-depth-1 transition-colors duration-200"
                 />
               </div>
             </Panel>
-            <PanelResizeHandle />
+            <PanelResizeHandle className="w-1 hover:bg-bolt-elements-borderColorActive transition-colors" />
             <Panel className="flex flex-col" defaultSize={80} minSize={20}>
               <PanelHeader className="overflow-x-auto">
                 {activeFileSegments?.length && (
@@ -151,11 +152,17 @@ export const EditorPanel = memo(
                     <FileBreadcrumb pathSegments={activeFileSegments} files={files} onFileSelect={onFileSelect} />
                     {activeFileUnsaved && (
                       <div className="flex gap-1 ml-auto -mr-1.5">
-                        <PanelHeaderButton onClick={onFileSave}>
+                        <PanelHeaderButton
+                          onClick={onFileSave}
+                          className="hover:bg-bolt-elements-background-depth-1 transition-colors duration-200"
+                        >
                           <div className="i-ph:floppy-disk-duotone" />
                           Save
                         </PanelHeaderButton>
-                        <PanelHeaderButton onClick={onFileReset}>
+                        <PanelHeaderButton
+                          onClick={onFileReset}
+                          className="hover:bg-bolt-elements-background-depth-1 transition-colors duration-200"
+                        >
                           <div className="i-ph:clock-counter-clockwise-duotone" />
                           Reset
                         </PanelHeaderButton>
@@ -206,10 +213,10 @@ export const EditorPanel = memo(
                     <button
                       key={index}
                       className={classNames(
-                        'flex items-center text-sm cursor-pointer gap-1.5 px-3 py-2 h-full whitespace-nowrap rounded-full',
+                        'flex items-center text-sm cursor-pointer gap-1.5 px-3 py-2 h-full whitespace-nowrap rounded-full transition-colors duration-200',
                         {
                           'bg-bolt-elements-terminals-buttonBackground text-bolt-elements-textPrimary': isActive,
-                          'bg-bolt-elements-background-depth-2 text-bolt-elements-textSecondary hover:bg-bolt-elements-terminals-buttonBackground':
+                          'bg-bolt-elements-background-depth-2 text-bolt-elements-textSecondary hover:bg-bolt-elements-terminals-buttonBackground hover:text-bolt-elements-textPrimary':
                             !isActive,
                         },
                       )}
@@ -220,9 +227,16 @@ export const EditorPanel = memo(
                     </button>
                   );
                 })}
-                {terminalCount < MAX_TERMINALS && <IconButton icon="i-ph:plus" size="md" onClick={addTerminal} />}
+                {terminalCount < MAX_TERMINALS && (
+                  <IconButton
+                    icon="i-ph:plus"
+                    size="md"
+                    onClick={addTerminal}
+                    className="hover:bg-bolt-elements-background-depth-1 transition-colors duration-200"
+                  />
+                )}
                 <IconButton
-                  className="ml-auto"
+                  className="ml-auto hover:bg-bolt-elements-background-depth-1 transition-colors duration-200"
                   icon="i-ph:caret-down"
                   title="Close"
                   size="md"

@@ -21,172 +21,116 @@ export function reconfigureTheme(theme: Theme) {
 function getEditorTheme(settings: EditorSettings) {
   return EditorView.theme({
     '&': {
-      fontSize: settings.fontSize ?? '12px',
+      fontSize: settings.fontSize ?? '14px',
+      fontFamily: '"Consolas", "Courier New", monospace',
     },
     '&.cm-editor': {
       height: '100%',
-      background: 'var(--cm-backgroundColor)',
-      color: 'var(--cm-textColor)',
     },
-    '.cm-cursor': {
-      borderLeft: 'var(--cm-cursor-width) solid var(--cm-cursor-backgroundColor)',
+    '.cm-content': {
+      caretColor: 'var(--vscode-editor-foreground)',
     },
-    '.cm-scroller': {
-      lineHeight: '1.5',
-      '&:focus-visible': {
-        outline: 'none',
-      },
+    '.cm-cursor, .cm-dropCursor': {
+      borderLeftColor: 'var(--vscode-editorCursor-foreground)',
     },
-    '.cm-line': {
-      padding: '0 0 0 4px',
-    },
-    '&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': {
-      backgroundColor: 'var(--cm-selection-backgroundColorFocused) !important',
-      opacity: 'var(--cm-selection-backgroundOpacityFocused, 0.3)',
-    },
-    '&:not(.cm-focused) > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': {
-      backgroundColor: 'var(--cm-selection-backgroundColorBlured)',
-      opacity: 'var(--cm-selection-backgroundOpacityBlured, 0.3)',
-    },
-    '&.cm-focused > .cm-scroller .cm-matchingBracket': {
-      backgroundColor: 'var(--cm-matching-bracket)',
+    '.cm-selectionBackground, .cm-content ::selection': {
+      backgroundColor: 'var(--vscode-editor-selectionBackground)',
     },
     '.cm-activeLine': {
-      background: 'var(--cm-activeLineBackgroundColor)',
+      backgroundColor: 'var(--vscode-editor-lineHighlightBackground)',
     },
-    '.cm-gutters': {
-      background: 'var(--cm-gutter-backgroundColor)',
-      borderRight: 0,
-      color: 'var(--cm-gutter-textColor)',
+    '.cm-selectionMatch': {
+      backgroundColor: 'var(--vscode-editor-findMatchHighlightBackground)',
     },
-    '.cm-gutter': {
-      '&.cm-lineNumbers': {
-        fontFamily: 'Roboto Mono, monospace',
-        fontSize: settings.gutterFontSize ?? settings.fontSize ?? '12px',
-        minWidth: '40px',
-      },
-      '& .cm-activeLineGutter': {
-        background: 'transparent',
-        color: 'var(--cm-gutter-activeLineTextColor)',
-      },
-      '&.cm-foldGutter .cm-gutterElement > .fold-icon': {
-        cursor: 'pointer',
-        color: 'var(--cm-foldGutter-textColor)',
-        transform: 'translateY(2px)',
-        '&:hover': {
-          color: 'var(--cm-foldGutter-textColorHover)',
-        },
-      },
-    },
-    '.cm-foldGutter .cm-gutterElement': {
+    '.cm-line': {
       padding: '0 4px',
     },
-    '.cm-tooltip-autocomplete > ul > li': {
-      minHeight: '18px',
+    '.cm-gutters': {
+      backgroundColor: 'var(--vscode-editorGutter-background)',
+      color: 'var(--vscode-editorLineNumber-foreground)',
+      border: 'none',
     },
-    '.cm-panel.cm-search label': {
-      marginLeft: '2px',
+    '.cm-gutter': {
+      minWidth: '24px',
+    },
+    '.cm-lineNumbers .cm-gutterElement': {
+      padding: '0 4px 0 24px',
+    },
+    '.cm-foldGutter': {
       fontSize: '12px',
     },
-    '.cm-panel.cm-search .cm-button': {
-      fontSize: '12px',
+    '.cm-foldGutter .cm-gutterElement': {
+      padding: '0 5px',
     },
-    '.cm-panel.cm-search .cm-textfield': {
-      fontSize: '12px',
-    },
-    '.cm-panel.cm-search input[type=checkbox]': {
-      position: 'relative',
-      transform: 'translateY(2px)',
-      marginRight: '4px',
-    },
-    '.cm-panels': {
-      borderColor: 'var(--cm-panels-borderColor)',
-    },
-    '.cm-panels-bottom': {
-      borderTop: '1px solid var(--cm-panels-borderColor)',
-      backgroundColor: 'transparent',
-    },
-    '.cm-panel.cm-search': {
-      background: 'var(--cm-search-backgroundColor)',
-      color: 'var(--cm-search-textColor)',
-      padding: '8px',
-    },
-    '.cm-search .cm-button': {
-      background: 'var(--cm-search-button-backgroundColor)',
-      borderColor: 'var(--cm-search-button-borderColor)',
-      color: 'var(--cm-search-button-textColor)',
-      borderRadius: '4px',
-      '&:hover': {
-        color: 'var(--cm-search-button-textColorHover)',
-      },
-      '&:focus-visible': {
-        outline: 'none',
-        borderColor: 'var(--cm-search-button-borderColorFocused)',
-      },
-      '&:hover:not(:focus-visible)': {
-        background: 'var(--cm-search-button-backgroundColorHover)',
-        borderColor: 'var(--cm-search-button-borderColorHover)',
-      },
-      '&:hover:focus-visible': {
-        background: 'var(--cm-search-button-backgroundColorHover)',
-        borderColor: 'var(--cm-search-button-borderColorFocused)',
-      },
-    },
-    '.cm-panel.cm-search [name=close]': {
-      top: '6px',
-      right: '6px',
-      padding: '0 6px',
-      fontSize: '1rem',
-      backgroundColor: 'var(--cm-search-closeButton-backgroundColor)',
-      color: 'var(--cm-search-closeButton-textColor)',
-      '&:hover': {
-        'border-radius': '6px',
-        color: 'var(--cm-search-closeButton-textColorHover)',
-        backgroundColor: 'var(--cm-search-closeButton-backgroundColorHover)',
-      },
-    },
-    '.cm-search input': {
-      background: 'var(--cm-search-input-backgroundColor)',
-      borderColor: 'var(--cm-search-input-borderColor)',
-      color: 'var(--cm-search-input-textColor)',
-      outline: 'none',
-      borderRadius: '4px',
-      '&:focus-visible': {
-        borderColor: 'var(--cm-search-input-borderColorFocused)',
-      },
+    '.cm-matchingBracket, .cm-nonmatchingBracket': {
+      backgroundColor: 'var(--vscode-editorBracketMatch-background)',
+      outline: '1px solid var(--vscode-editorBracketMatch-border)',
     },
     '.cm-tooltip': {
-      background: 'var(--cm-tooltip-backgroundColor)',
-      border: '1px solid transparent',
-      borderColor: 'var(--cm-tooltip-borderColor)',
-      color: 'var(--cm-tooltip-textColor)',
+      border: '1px solid var(--vscode-editorHoverWidget-border)',
+      backgroundColor: 'var(--vscode-editorHoverWidget-background)',
+      color: 'var(--vscode-editorHoverWidget-foreground)',
     },
-    '.cm-tooltip.cm-tooltip-autocomplete ul li[aria-selected]': {
-      background: 'var(--cm-tooltip-backgroundColorSelected)',
-      color: 'var(--cm-tooltip-textColorSelected)',
+    '.cm-tooltip-autocomplete': {
+      '& > ul > li': {
+        padding: '4px 8px',
+      },
+      '& > ul > li[aria-selected]': {
+        backgroundColor: 'var(--vscode-list-activeSelectionBackground)',
+        color: 'var(--vscode-list-activeSelectionForeground)',
+      },
+    },
+    '.cm-panels': {
+      backgroundColor: 'var(--vscode-editorWidget-background)',
+      color: 'var(--vscode-editorWidget-foreground)',
+    },
+    '.cm-panels-top': {
+      borderBottom: '1px solid var(--vscode-editorWidget-border)',
+    },
+    '.cm-panels-bottom': {
+      borderTop: '1px solid var(--vscode-editorWidget-border)',
+    },
+    '.cm-search': {
+      padding: '4px 8px',
+      '& label': {
+        fontSize: '13px',
+      },
+      '& input, & button, & select': {
+        fontSize: '13px',
+        background: 'var(--vscode-input-background)',
+        border: '1px solid var(--vscode-input-border)',
+        color: 'var(--vscode-input-foreground)',
+      },
+      '& input:focus, & select:focus': {
+        outline: 'none',
+        border: '1px solid var(--vscode-focusBorder)',
+      },
+      '& button:hover': {
+        background: 'var(--vscode-button-hoverBackground)',
+      },
     },
     '.cm-searchMatch': {
-      backgroundColor: 'var(--cm-searchMatch-backgroundColor)',
+      backgroundColor: 'var(--vscode-editor-findMatchBackground)',
+      outline: '1px solid var(--vscode-editor-findMatchBorder)',
     },
-    '.cm-tooltip.cm-readonly-tooltip': {
-      padding: '4px',
-      whiteSpace: 'nowrap',
-      backgroundColor: 'var(--bolt-elements-bg-depth-2)',
-      borderColor: 'var(--bolt-elements-borderColorActive)',
-      '& .cm-tooltip-arrow:before': {
-        borderTopColor: 'var(--bolt-elements-borderColorActive)',
-      },
-      '& .cm-tooltip-arrow:after': {
-        borderTopColor: 'transparent',
-      },
+    '.cm-searchMatch-selected': {
+      backgroundColor: 'var(--vscode-editor-findMatchHighlightBackground)',
+    },
+    '.cm-selectionLayer .cm-selectionBackground': {
+      backgroundColor: 'var(--vscode-editor-selectionBackground)',
+    },
+    '.cm-foldPlaceholder': {
+      backgroundColor: 'var(--vscode-editor-foldBackground)',
+      border: 'none',
+      color: 'var(--vscode-editorGutter-foldingControlForeground)',
     },
   });
 }
 
 function getLightTheme() {
-  return vscodeLight;
+  return [vscodeLight];
 }
 
 function getDarkTheme() {
-  return vscodeDark;
+  return [vscodeDark];
 }

@@ -12,6 +12,12 @@ export async function action(args: ActionFunctionArgs) {
 
 async function enhancerAction({ context, request }: ActionFunctionArgs) {
   const { message } = await request.json<{ message: string }>();
+  if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    return new Response(JSON.stringify({ error: 'Invalid or empty message' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
     const result = await streamText(
@@ -39,7 +45,7 @@ async function enhancerAction({ context, request }: ActionFunctionArgs) {
           .split('\n')
           .filter((line) => line !== '')
           .map(parseStreamPart)
-          .map((part) => part.value)
+          .map((part) => part.value || '')
           .join('');
 
         controller.enqueue(encoder.encode(processedChunk));
@@ -50,11 +56,10 @@ async function enhancerAction({ context, request }: ActionFunctionArgs) {
 
     return new StreamingTextResponse(transformedStream);
   } catch (error) {
-    console.log(error);
-
-    throw new Response(null, {
+    console.error('Error in enhancerAction:', error);
+    return new Response(JSON.stringify({ error: 'An unexpected error occurred during prompt enhancement' }), {
       status: 500,
-      statusText: 'Internal Server Error',
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }

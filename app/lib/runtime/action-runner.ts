@@ -92,6 +92,7 @@ export class ActionRunner {
       })
       .catch((error) => {
         console.error('Action failed:', error);
+        this.#updateAction(actionId, { status: 'failed', error: error.message });
       });
   }
 
@@ -128,25 +129,49 @@ export class ActionRunner {
 
     const webcontainer = await this.#webcontainer;
 
-    const process = await webcontainer.spawn('jsh', ['-c', action.content], {
-      env: { npm_config_yes: true },
-    });
+    try {
+      const process = await webcontainer.spawn('jsh', ['-c', action.content], {
+        env: { npm_config_yes: true },
+      });
 
-    action.abortSignal.addEventListener('abort', () => {
-      process.kill();
-    });
+      action.abortSignal.addEventListener('abort', () => {
+        process.kill();
+      });
 
-    process.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          console.log(data);
-        },
-      }),
-    );
+      let output = '';
+      const timeout = 60000; // 60 seconds timeout
 
-    const exitCode = await process.exit;
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Command execution timed out')), timeout);
+      });
 
-    logger.debug(`Process terminated with code ${exitCode}`);
+      const processPromise = new Promise<number>((resolve) => {
+        process.output.pipeTo(
+          new WritableStream({
+            write(data) {
+              console.log(data);
+              output += data;
+            },
+          })
+        );
+
+        process.exit.then(resolve);
+      });
+
+      const exitCode = await Promise.race([processPromise, timeoutPromise]);
+
+      logger.debug(`Process terminated with code ${exitCode}`);
+      logger.debug(`Command output: ${output}`);
+
+      if (typeof exitCode !== 'number') {
+        throw new Error('Command execution failed');
+      }
+
+      return exitCode;
+    } catch (error) {
+      logger.error('Shell action failed:', error);
+      throw error;
+    }
   }
 
   async #runFileAction(action: ActionState) {

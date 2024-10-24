@@ -14,6 +14,7 @@ export default async function handleRequest(
   remixContext: EntryContext,
   _loadContext: AppLoadContext,
 ) {
+  console.log(`Handling request for ${request.url} with status ${responseStatusCode}`);
   await initializeModelList();
 
   const readable = await renderToReadableStream(<RemixServer context={remixContext} url={request.url} />, {
@@ -73,6 +74,9 @@ export default async function handleRequest(
 
   responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
   responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
+  responseHeaders.set('X-Content-Type-Options', 'nosniff');
+  responseHeaders.set('X-Frame-Options', 'DENY');
+  responseHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   return new Response(body, {
     headers: responseHeaders,

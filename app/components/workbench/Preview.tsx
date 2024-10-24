@@ -20,85 +20,71 @@ export const Preview = memo(() => {
     if (!activePreview) {
       setUrl('');
       setIframeUrl(undefined);
-
       return;
     }
 
     const { baseUrl } = activePreview;
-
     setUrl(baseUrl);
     setIframeUrl(baseUrl);
-  }, [activePreview, iframeUrl]);
+  }, [activePreview]);
 
-  const validateUrl = useCallback(
-    (value: string) => {
-      if (!activePreview) {
-        return false;
-      }
+  const validateUrl = useCallback((value: string) => {
+    if (!activePreview) return false;
+    const { baseUrl } = activePreview;
+    if (value === baseUrl) return true;
+    if (value.startsWith(baseUrl)) {
+      return ['/', '?', '#'].includes(value.charAt(baseUrl.length));
+    }
+    return false;
+  }, [activePreview]);
 
-      const { baseUrl } = activePreview;
+  const findMinPortIndex = useCallback((minIndex: number, preview: { port: number }, index: number, array: { port: number }[]) => {
+    return preview.port < array[minIndex].port ? index : minIndex;
+  }, []);
 
-      if (value === baseUrl) {
-        return true;
-      } else if (value.startsWith(baseUrl)) {
-        return ['/', '?', '#'].includes(value.charAt(baseUrl.length));
-      }
-
-      return false;
-    },
-    [activePreview],
-  );
-
-  const findMinPortIndex = useCallback(
-    (minIndex: number, preview: { port: number }, index: number, array: { port: number }[]) => {
-      return preview.port < array[minIndex].port ? index : minIndex;
-    },
-    [],
-  );
-
-  // when previews change, display the lowest port if user hasn't selected a preview
   useEffect(() => {
     if (previews.length > 1 && !hasSelectedPreview.current) {
       const minPortIndex = previews.reduce(findMinPortIndex, 0);
-
       setActivePreviewIndex(minPortIndex);
     }
-  }, [previews]);
+  }, [previews, findMinPortIndex]);
 
-  const reloadPreview = () => {
+  const reloadPreview = useCallback(() => {
     if (iframeRef.current) {
       iframeRef.current.src = iframeRef.current.src;
     }
-  };
+  }, []);
+
+  const handleUrlChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(event.target.value);
+  }, []);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && validateUrl(url)) {
+      setIframeUrl(url);
+      inputRef.current?.blur();
+    }
+  }, [url, validateUrl]);
+
+  const handlePortDropdownClick = useCallback(() => {
+    setIsPortDropdownOpen(false);
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col">
       {isPortDropdownOpen && (
-        <div className="z-iframe-overlay w-full h-full absolute" onClick={() => setIsPortDropdownOpen(false)} />
+        <div className="z-iframe-overlay w-full h-full absolute" onClick={handlePortDropdownClick} />
       )}
       <div className="bg-bolt-elements-background-depth-2 p-2 flex items-center gap-1.5">
         <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} />
-        <div
-          className="flex items-center gap-1 flex-grow bg-bolt-elements-preview-addressBar-background border border-bolt-elements-borderColor text-bolt-elements-preview-addressBar-text rounded-full px-3 py-1 text-sm hover:bg-bolt-elements-preview-addressBar-backgroundHover hover:focus-within:bg-bolt-elements-preview-addressBar-backgroundActive focus-within:bg-bolt-elements-preview-addressBar-backgroundActive
-        focus-within-border-bolt-elements-borderColorActive focus-within:text-bolt-elements-preview-addressBar-textActive"
-        >
+        <div className="flex items-center gap-1 flex-grow bg-bolt-elements-preview-addressBar-background border border-bolt-elements-borderColor text-bolt-elements-preview-addressBar-text rounded-full px-3 py-1 text-sm hover:bg-bolt-elements-preview-addressBar-backgroundHover hover:focus-within:bg-bolt-elements-preview-addressBar-backgroundActive focus-within:bg-bolt-elements-preview-addressBar-backgroundActive focus-within-border-bolt-elements-borderColorActive focus-within:text-bolt-elements-preview-addressBar-textActive">
           <input
             ref={inputRef}
             className="w-full bg-transparent outline-none"
             type="text"
             value={url}
-            onChange={(event) => {
-              setUrl(event.target.value);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && validateUrl(url)) {
-                setIframeUrl(url);
-
-                if (inputRef.current) {
-                  inputRef.current.blur();
-                }
-              }
-            }}
+            onChange={handleUrlChange}
+            onKeyDown={handleKeyDown}
           />
         </div>
         {previews.length > 1 && (

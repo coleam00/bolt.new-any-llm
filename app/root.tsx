@@ -71,9 +71,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {children}
-      <ScrollRestoration />
-      <Scripts />
+      <html lang="en" data-theme={theme} className="transition-theme">
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </html>
     </>
   );
 }

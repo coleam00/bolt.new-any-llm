@@ -1,5 +1,5 @@
 import type { WebContainer } from '@webcontainer/api';
-import { atom } from 'nanostores';
+import { atom, type WritableAtom } from 'nanostores';
 
 export interface PreviewInfo {
   port: number;
@@ -11,39 +11,45 @@ export class PreviewsStore {
   #availablePreviews = new Map<number, PreviewInfo>();
   #webcontainer: Promise<WebContainer>;
 
-  previews = atom<PreviewInfo[]>([]);
+  previews: WritableAtom<PreviewInfo[]> = atom<PreviewInfo[]>([]);
 
   constructor(webcontainerPromise: Promise<WebContainer>) {
     this.#webcontainer = webcontainerPromise;
-
     this.#init();
   }
 
   async #init() {
     const webcontainer = await this.#webcontainer;
+    webcontainer.on('port', this.#handlePortEvent);
+  }
 
-    webcontainer.on('port', (port, type, url) => {
-      let previewInfo = this.#availablePreviews.get(port);
+  #handlePortEvent = (port: number, type: 'open' | 'close', url: string) => {
+    if (type === 'close') {
+      this.#removePreview(port);
+      return;
+    }
 
-      if (type === 'close' && previewInfo) {
-        this.#availablePreviews.delete(port);
-        this.previews.set(this.previews.get().filter((preview) => preview.port !== port));
+    this.#updateOrAddPreview(port, url);
+  };
 
-        return;
-      }
+  #removePreview(port: number) {
+    this.#availablePreviews.delete(port);
+    this.previews.set(this.previews.get().filter(preview => preview.port !== port));
+  }
 
-      const previews = this.previews.get();
+  #updateOrAddPreview(port: number, url: string) {
+    const previews = this.previews.get();
+    let previewInfo = this.#availablePreviews.get(port);
 
-      if (!previewInfo) {
-        previewInfo = { port, ready: type === 'open', baseUrl: url };
-        this.#availablePreviews.set(port, previewInfo);
-        previews.push(previewInfo);
-      }
-
-      previewInfo.ready = type === 'open';
+    if (!previewInfo) {
+      previewInfo = { port, ready: true, baseUrl: url };
+      this.#availablePreviews.set(port, previewInfo);
+      previews.push(previewInfo);
+    } else {
+      previewInfo.ready = true;
       previewInfo.baseUrl = url;
+    }
 
-      this.previews.set([...previews]);
-    });
+    this.previews.set([...previews]);
   }
 }

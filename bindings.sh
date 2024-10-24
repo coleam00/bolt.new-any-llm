@@ -1,16 +1,23 @@
 #!/bin/bash
 
-bindings=""
+# Initialize an empty array to store bindings
+bindings=()
 
-while IFS= read -r line || [ -n "$line" ]; do
-  if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
-    name=$(echo "$line" | cut -d '=' -f 1)
-    value=$(echo "$line" | cut -d '=' -f 2-)
-    value=$(echo $value | sed 's/^"\(.*\)"$/\1/')
-    bindings+="--binding ${name}=${value} "
-  fi
+# Read .env.local file line by line
+while IFS='=' read -r name value || [[ -n "$name" ]]; do
+    # Skip empty lines and comments
+    [[ -z "$name" || "$name" =~ ^# ]] && continue
+
+    # Trim leading and trailing whitespace from name and value
+    name=$(echo "$name" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    value=$(echo "$value" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+    # Remove surrounding quotes if present
+    value=$(echo "$value" | sed -e 's/^"//' -e 's/"$//')
+
+    # Add to bindings array
+    bindings+=("--binding" "${name}=${value}")
 done < .env.local
 
-bindings=$(echo $bindings | sed 's/[[:space:]]*$//')
-
-echo $bindings
+# Join array elements with spaces and echo the result
+echo "${bindings[@]}"

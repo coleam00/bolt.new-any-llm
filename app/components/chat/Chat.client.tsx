@@ -202,6 +202,12 @@ export const ChatImpl = memo(({ initialMessages, storeMessageHistory }: ChatProp
 
   const [messageRef, scrollRef] = useSnapScroll();
 
+  const handleEnhancePrompt = async () => {
+    if (input.trim()) {
+      await enhancePrompt(input, setInput);
+    }
+  };
+
   return (
     <BaseChat
       ref={animationScope}
@@ -229,12 +235,7 @@ export const ChatImpl = memo(({ initialMessages, storeMessageHistory }: ChatProp
           content: parsedMessages[i] || '',
         };
       })}
-      enhancePrompt={() => {
-        enhancePrompt(input, (input) => {
-          setInput(input);
-          scrollTextArea();
-        });
-      }}
+      enhancePrompt={handleEnhancePrompt}
     />
   );
 });

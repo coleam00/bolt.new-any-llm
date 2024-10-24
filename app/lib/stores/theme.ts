@@ -31,5 +31,6 @@ export function toggleTheme() {
 
   localStorage.setItem(kTheme, newTheme);
 
-  document.querySelector('html')?.setAttribute('data-theme', newTheme);
+  document.documentElement.setAttribute('data-theme', newTheme);
+  document.documentElement.style.colorScheme = newTheme;
 }

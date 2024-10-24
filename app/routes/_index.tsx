@@ -11,10 +11,19 @@ export const meta: MetaFunction = () => {
 export const loader = () => json({});
 
 export default function Index() {
+  // Define the model and setModel properties
+  const model = "defaultModel"; // Replace with your actual model
+  const setModel = (newModel: string) => {
+    console.log("Model set to:", newModel);
+    // Implement your logic to update the model
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       <Header />
-      <ClientOnly fallback={<BaseChat />}>{() => <Chat />}</ClientOnly>
+      <ClientOnly fallback={<BaseChat model={model} setModel={setModel} />}>
+        {() => <Chat />}
+      </ClientOnly>
     </div>
   );
 }

@@ -35,17 +35,16 @@ const BASE_COLORS = {
     950: '#0A0A0A',
   },
   accent: {
-    50: '#EEF9FF',
-    100: '#D8F1FF',
-    200: '#BAE7FF',
-    300: '#8ADAFF',
-    400: '#53C4FF',
-    500: '#2BA6FF',
-    600: '#1488FC',
-    700: '#0D6FE8',
-    800: '#1259BB',
-    900: '#154E93',
-    950: '#122F59',
+    50: '#E6F7FF',
+    100: '#BAE7FF',
+    200: '#91D5FF',
+    300: '#69C0FF',
+    400: '#40A9FF',
+    500: '#1890FF',
+    600: '#096DD9',
+    700: '#0050B3',
+    800: '#003A8C',
+    900: '#002766',
   },
   green: {
     50: '#F0FDF4',
@@ -100,7 +99,7 @@ const COLOR_PRIMITIVES = {
 export default defineConfig({
   shortcuts: {
     'bolt-ease-cubic-bezier': 'ease-[cubic-bezier(0.4,0,0.2,1)]',
-    'transition-theme': 'transition-[background-color,border-color,color] duration-150 bolt-ease-cubic-bezier',
+    'transition-theme': 'transition-[background-color,border-color,color] duration-[var(--bolt-transition-duration)] ease-[var(--bolt-transition-timing)]',
     kdb: 'bg-bolt-elements-code-background text-bolt-elements-code-text py-1 px-1.5 rounded-md',
     'max-w-chat': 'max-w-[var(--chat-max-width)]',
   },
@@ -237,9 +236,11 @@ export default defineConfig({
       },
     }),
     presetIcons({
+      scale: 1.2,
       warn: true,
       collections: {
         ...customIconCollection,
+        mdi: () => import('@iconify-json/mdi/icons.json').then(i => i.default),
       },
     }),
   ],

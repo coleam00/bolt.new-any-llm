@@ -43,11 +43,13 @@ function chrome129IssuePlugin() {
     name: 'chrome129IssuePlugin',
     configureServer(server: ViteDevServer) {
       server.middlewares.use((req, res, next) => {
+        // Check if the user agent is Chrome version 129
         const raw = req.headers['user-agent']?.match(/Chrom(e|ium)\/([0-9]+)\./);
 
         if (raw) {
           const version = parseInt(raw[2], 10);
 
+          // If it's Chrome 129, show a warning message
           if (version === 129) {
             res.setHeader('content-type', 'text/html');
             res.end(

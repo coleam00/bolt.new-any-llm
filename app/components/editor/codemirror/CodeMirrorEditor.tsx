@@ -253,6 +253,13 @@ export const CodeMirrorEditor = memo(
       );
     }, [doc?.value, editable, doc?.filePath, autoFocusOnDocumentChange]);
 
+    useEffect(() => {
+      const editorElement = viewRef.current?.dom;
+      if (editorElement) {
+        editorElement.classList.add('transition-theme');
+      }
+    }, [theme]);
+
     return (
       <div className={classNames('relative h-full', className)}>
         {doc?.isBinary && <BinaryContent />}

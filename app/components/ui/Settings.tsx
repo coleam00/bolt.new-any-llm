@@ -21,10 +21,17 @@ type TabType = 'chat-history' | 'providers' | 'features' | 'debug';
 // Providers that support base URL configuration
 const URL_CONFIGURABLE_PROVIDERS = ['Ollama', 'LMStudio', 'OpenAILike'];
 
+// Add LOCAL_PROVIDERS constant after URL_CONFIGURABLE_PROVIDERS
+const LOCAL_PROVIDERS = ['Ollama', 'LMStudio'];
+
 export const Settings = ({ open, onClose }: SettingsProps) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('chat-history');
   const [isDebugEnabled, setIsDebugEnabled] = useState(false);
+  const [isLocalProvidersEnabled, setIsLocalProvidersEnabled] = useState(() => {
+    const saved = Cookies.get('localProvidersEnabled');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -110,7 +117,11 @@ export const Settings = ({ open, onClose }: SettingsProps) => {
   };
 
   const filteredProviders = providers
-    .filter((provider) => provider.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((provider) => {
+      const matchesSearch = provider.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const isLocalProvider = LOCAL_PROVIDERS.includes(provider.name);
+      return matchesSearch && (isLocalProvidersEnabled || !isLocalProvider);
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const handleCopyToClipboard = () => {
@@ -325,8 +336,36 @@ export const Settings = ({ open, onClose }: SettingsProps) => {
                   )}
                   {activeTab === 'features' && (
                     <div className="p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <span className="text-white">Local Providers</span>
+                          <p className="text-sm text-gray-400">Enable experimental local AI providers like Ollama and LM Studio</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={isLocalProvidersEnabled}
+                            onChange={() => {
+                              const newValue = !isLocalProvidersEnabled;
+                              setIsLocalProvidersEnabled(newValue);
+                              Cookies.set('localProvidersEnabled', JSON.stringify(newValue));
+                            }}
+                          />
+                          <div className="w-11 h-6 bg-gray-300 rounded-full shadow-inner"></div>
+                          <div
+                            className={`absolute left-0 w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ease-in-out ${
+                              isLocalProvidersEnabled ? 'transform translate-x-full bg-green-500' : ''
+                            }`}
+                          ></div>
+                        </label>
+                      </div>
+
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-white">Debug Info</span>
+                        <div>
+                          <span className="text-white">Debug Info</span>
+                          <p className="text-sm text-gray-400">Enable debug information and tools</p>
+                        </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"

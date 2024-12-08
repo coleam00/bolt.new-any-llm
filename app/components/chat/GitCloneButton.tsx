@@ -97,7 +97,13 @@ ${file.content}
       }
     }
   };
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
+  if (error) {
+    return <ErrorDisplay error={error} onRetry={() => setError(null)} />;
+  }
+  
   return (
     <WithTooltip tooltip="Clone A Git Repo">
       <button
@@ -105,10 +111,11 @@ ${file.content}
           onClick(e);
         }}
         title="Clone A Git Repo"
+        disabled={isLoading || !ready}
         className="px-4 py-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 transition-all flex items-center gap-2"
       >
         <span className="i-ph:git-branch" />
-        Clone A Git Repo
+        {isLoading ? 'Cloning...' : 'Clone A Git Repo'}
       </button>
     </WithTooltip>
   );

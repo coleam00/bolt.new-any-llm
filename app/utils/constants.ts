@@ -366,14 +366,14 @@ const getOllamaBaseUrl = () => {
 };
 
 async function getOllamaModels(): Promise<ModelInfo[]> {
-  /*
-   * if (typeof window === 'undefined') {
-   * return [];
-   * }
-   */
-
   try {
     const baseUrl = getOllamaBaseUrl();
+
+    if (!baseUrl) {
+      // Breaks early if baseURL not set. Fixes "Error getting Ollama models"
+      return [];
+    }
+    
     const response = await fetch(`${baseUrl}/api/tags`);
     const data = (await response.json()) as OllamaApiResponse;
 

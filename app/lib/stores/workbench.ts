@@ -261,9 +261,9 @@ export class WorkbenchStore {
     this.artifacts.setKey(messageId, { ...artifact, ...state });
   }
   addAction(data: ActionCallbackData) {
-    this._addAction(data);
+    // this._addAction(data);
 
-    // this.addToExecutionQueue(()=>this._addAction(data))
+    this.addToExecutionQueue(() => this._addAction(data));
   }
   async _addAction(data: ActionCallbackData) {
     const { messageId } = data;
@@ -291,6 +291,12 @@ export class WorkbenchStore {
 
     if (!artifact) {
       unreachable('Artifact not found');
+    }
+
+    const action = artifact.runner.actions.get()[data.actionId];
+
+    if (action.executed) {
+      return;
     }
 
     if (data.action.type === 'file') {

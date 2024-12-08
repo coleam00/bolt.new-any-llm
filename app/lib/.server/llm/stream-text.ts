@@ -71,9 +71,7 @@ export async function streamText(
     if (message.role === 'user') {
       const { model, provider, content } = extractPropertiesFromMessage(message);
 
-      if (MODEL_LIST.find((m) => m.name === model)) {
-        currentModel = model;
-      }
+      currentModel = model;
 
       currentProvider = provider;
 

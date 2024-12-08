@@ -291,19 +291,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const baseChat = (
       <div
         ref={ref}
-        className={classNames(
-          styles.BaseChat,
-          'relative flex flex-col lg:flex-row h-full w-full overflow-hidden bg-bolt-elements-background-depth-1',
-        )}
+        className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
       >
-        <div className={classNames(styles.RayContainer)}>
-          <div className={classNames(styles.LightRayOne)}></div>
-          <div className={classNames(styles.LightRayTwo)}></div>
-          <div className={classNames(styles.LightRayThree)}></div>
-          <div className={classNames(styles.LightRayFour)}></div>
-          <div className={classNames(styles.LightRayFive)}></div>
-        </div>
         <ClientOnly>{() => <Menu />}</ClientOnly>
         <div ref={scrollRef} className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
@@ -353,15 +343,15 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       gradientUnits="userSpaceOnUse"
                       gradientTransform="rotate(-45)"
                     >
-                      <stop offset="0%" stopColor="#1488fc" stopOpacity="0%"></stop>
-                      <stop offset="40%" stopColor="#1488fc" stopOpacity="80%"></stop>
-                      <stop offset="50%" stopColor="#1488fc" stopOpacity="80%"></stop>
-                      <stop offset="100%" stopColor="#1488fc" stopOpacity="0%"></stop>
+                      <stop offset="0%" stopColor="#b44aff" stopOpacity="0%"></stop>
+                      <stop offset="40%" stopColor="#b44aff" stopOpacity="80%"></stop>
+                      <stop offset="50%" stopColor="#b44aff" stopOpacity="80%"></stop>
+                      <stop offset="100%" stopColor="#b44aff" stopOpacity="0%"></stop>
                     </linearGradient>
                     <linearGradient id="shine-gradient">
                       <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>
-                      <stop offset="40%" stopColor="#8adaff" stopOpacity="80%"></stop>
-                      <stop offset="50%" stopColor="#8adaff" stopOpacity="80%"></stop>
+                      <stop offset="40%" stopColor="#ffffff" stopOpacity="80%"></stop>
+                      <stop offset="50%" stopColor="#ffffff" stopOpacity="80%"></stop>
                       <stop offset="100%" stopColor="white" stopOpacity="0%"></stop>
                     </linearGradient>
                   </defs>

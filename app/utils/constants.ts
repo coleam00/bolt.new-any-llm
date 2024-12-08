@@ -127,7 +127,7 @@ const PROVIDER_LIST: ProviderInfo[] = [
       { name: 'gemini-1.5-flash-8b', label: 'Gemini 1.5 Flash-8b', provider: 'Google', maxTokenAllowed: 8192 },
       { name: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro', provider: 'Google', maxTokenAllowed: 8192 },
       { name: 'gemini-1.5-pro-002', label: 'Gemini 1.5 Pro-002', provider: 'Google', maxTokenAllowed: 8192 },
-      { name: 'gemini-exp-1121', label: 'Gemini exp-1121', provider: 'Google', maxTokenAllowed: 8192 },
+      { name: 'gemini-exp-1206', label: 'Gemini exp-1206', provider: 'Google', maxTokenAllowed: 8192 },
     ],
     getApiKeyLink: 'https://aistudio.google.com/app/apikey',
   },

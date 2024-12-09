@@ -11,33 +11,7 @@ export const DEFAULT_MODEL = 'claude-3-5-sonnet-latest';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 
 const PROVIDER_LIST: ProviderInfo[] = [
-  {
-    name: 'Anthropic',
-    staticModels: [
-      {
-        name: 'claude-3-5-sonnet-latest',
-        label: 'Claude 3.5 Sonnet (new)',
-        provider: 'Anthropic',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'claude-3-5-sonnet-20240620',
-        label: 'Claude 3.5 Sonnet (old)',
-        provider: 'Anthropic',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'claude-3-5-haiku-latest',
-        label: 'Claude 3.5 Haiku (new)',
-        provider: 'Anthropic',
-        maxTokenAllowed: 8000,
-      },
-      { name: 'claude-3-opus-latest', label: 'Claude 3 Opus', provider: 'Anthropic', maxTokenAllowed: 8000 },
-      { name: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet', provider: 'Anthropic', maxTokenAllowed: 8000 },
-      { name: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku', provider: 'Anthropic', maxTokenAllowed: 8000 },
-    ],
-    getApiKeyLink: 'https://console.anthropic.com/settings/keys',
-  },
+  // Internal API's
   {
     name: 'Ollama',
     staticModels: [],
@@ -50,6 +24,28 @@ const PROVIDER_LIST: ProviderInfo[] = [
     name: 'OpenAILike',
     staticModels: [],
     getDynamicModels: getOpenAILikeModels,
+  },
+  {
+    name: 'LMStudio',
+    staticModels: [],
+    getDynamicModels: getLMStudioModels,
+    getApiKeyLink: 'https://lmstudio.ai/',
+    labelForGetApiKey: 'Get LMStudio',
+    icon: 'i-ph:cloud-arrow-down',
+  },
+  
+  // External API's
+  {
+    name: 'Anthropic',
+    staticModels: [
+      { name: 'claude-3-5-sonnet-latest', label: 'Claude 3.5 Sonnet (new)', provider: 'Anthropic', maxTokenAllowed: 8000, },
+      { name: 'claude-3-5-sonnet-20240620', label: 'Claude 3.5 Sonnet (old)', provider: 'Anthropic', maxTokenAllowed: 8000, },
+      { name: 'claude-3-5-haiku-latest', label: 'Claude 3.5 Haiku (new)', provider: 'Anthropic', maxTokenAllowed: 8000, },
+      { name: 'claude-3-opus-latest', label: 'Claude 3 Opus', provider: 'Anthropic', maxTokenAllowed: 8000 },
+      { name: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet', provider: 'Anthropic', maxTokenAllowed: 8000 },
+      { name: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku', provider: 'Anthropic', maxTokenAllowed: 8000 },
+    ],
+    getApiKeyLink: 'https://console.anthropic.com/settings/keys',
   },
   {
     name: 'Cohere',
@@ -71,49 +67,14 @@ const PROVIDER_LIST: ProviderInfo[] = [
     name: 'OpenRouter',
     staticModels: [
       { name: 'gpt-4o', label: 'GPT-4o', provider: 'OpenAI', maxTokenAllowed: 8000 },
-      {
-        name: 'anthropic/claude-3.5-sonnet',
-        label: 'Anthropic: Claude 3.5 Sonnet (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'anthropic/claude-3-haiku',
-        label: 'Anthropic: Claude 3 Haiku (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'deepseek/deepseek-coder',
-        label: 'Deepseek-Coder V2 236B (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'google/gemini-flash-1.5',
-        label: 'Google Gemini Flash 1.5 (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'google/gemini-pro-1.5',
-        label: 'Google Gemini Pro 1.5 (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
+      { name: 'anthropic/claude-3.5-sonnet', label: 'Anthropic: Claude 3.5 Sonnet (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
+      { name: 'anthropic/claude-3-haiku', label: 'Anthropic: Claude 3 Haiku (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
+      { name: 'deepseek/deepseek-coder', label: 'Deepseek-Coder V2 236B (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
+      { name: 'google/gemini-flash-1.5', label: 'Google Gemini Flash 1.5 (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
+      { name: 'google/gemini-pro-1.5', label: 'Google Gemini Pro 1.5 (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
       { name: 'x-ai/grok-beta', label: 'xAI Grok Beta (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000 },
-      {
-        name: 'mistralai/mistral-nemo',
-        label: 'OpenRouter Mistral Nemo (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'qwen/qwen-110b-chat',
-        label: 'OpenRouter Qwen 110b Chat (OpenRouter)',
-        provider: 'OpenRouter',
-        maxTokenAllowed: 8000,
-      },
+      { name: 'mistralai/mistral-nemo', label: 'OpenRouter Mistral Nemo (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
+      { name: 'qwen/qwen-110b-chat', label: 'OpenRouter Qwen 110b Chat (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000, },
       { name: 'cohere/command', label: 'Cohere Command (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 4096 },
     ],
     getDynamicModels: getOpenRouterModels,
@@ -145,76 +106,19 @@ const PROVIDER_LIST: ProviderInfo[] = [
   {
     name: 'HuggingFace',
     staticModels: [
-      {
-        name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: '01-ai/Yi-1.5-34B-Chat',
-        label: 'Yi-1.5-34B-Chat (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'codellama/CodeLlama-34b-Instruct-hf',
-        label: 'CodeLlama-34b-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'NousResearch/Hermes-3-Llama-3.1-8B',
-        label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'Qwen/Qwen2.5-72B-Instruct',
-        label: 'Qwen2.5-72B-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'meta-llama/Llama-3.1-70B-Instruct',
-        label: 'Llama-3.1-70B-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'meta-llama/Llama-3.1-405B',
-        label: 'Llama-3.1-405B (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: '01-ai/Yi-1.5-34B-Chat',
-        label: 'Yi-1.5-34B-Chat (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'codellama/CodeLlama-34b-Instruct-hf',
-        label: 'CodeLlama-34b-Instruct (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'NousResearch/Hermes-3-Llama-3.1-8B',
-        label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
-        provider: 'HuggingFace',
-        maxTokenAllowed: 8000,
-      },
+      { name: '01-ai/Yi-1.5-34B-Chat', label: 'Yi-1.5-34B-Chat (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'codellama/CodeLlama-34b-Instruct-hf', label: 'CodeLlama-34b-Instruct (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'NousResearch/Hermes-3-Llama-3.1-8B', label: 'Hermes-3-Llama-3.1-8B (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'Qwen/Qwen2.5-Coder-32B-Instruct', label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'Qwen/Qwen2.5-72B-Instruct', label: 'Qwen2.5-72B-Instruct (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'Qwen/QwQ-32B-Preview', label: 'QwQ-32B-Preview (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'meta-llama/Llama-3.1-8B-Instruct', label: 'Llama-3.1-8B-Instruct (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'meta-llama/Llama-3.1-70B-Instruct', label: 'Llama-3.1-70B-Instruct (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'meta-llama/Llama-3.1-405B', label: 'Llama-3.1-405B (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
+      { name: 'NousResearch/Hermes-3-Llama-3.1-8B', label: 'Hermes-3-Llama-3.1-8B (HuggingFace)', provider: 'HuggingFace', maxTokenAllowed: 8000, },
     ],
     getApiKeyLink: 'https://huggingface.co/settings/tokens',
   },
-
   {
     name: 'OpenAI',
     staticModels: [
@@ -254,36 +158,12 @@ const PROVIDER_LIST: ProviderInfo[] = [
     getApiKeyLink: 'https://console.mistral.ai/api-keys/',
   },
   {
-    name: 'LMStudio',
-    staticModels: [],
-    getDynamicModels: getLMStudioModels,
-    getApiKeyLink: 'https://lmstudio.ai/',
-    labelForGetApiKey: 'Get LMStudio',
-    icon: 'i-ph:cloud-arrow-down',
-  },
-  {
     name: 'Together',
     getDynamicModels: getTogetherModels,
     staticModels: [
-      {
-        name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        label: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-        provider: 'Together',
-        maxTokenAllowed: 8000,
-      },
-      {
-        name: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
-        label: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
-        provider: 'Together',
-        maxTokenAllowed: 8000,
-      },
-
-      {
-        name: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
-        label: 'Mixtral 8x7B Instruct',
-        provider: 'Together',
-        maxTokenAllowed: 8192,
-      },
+      { name: 'Qwen/Qwen2.5-Coder-32B-Instruct', label: 'Qwen/Qwen2.5-Coder-32B-Instruct', provider: 'Together', maxTokenAllowed: 8000, },
+      { name: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo', label: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo', provider: 'Together', maxTokenAllowed: 8000, },
+      { name: 'mistralai/Mixtral-8x7B-Instruct-v0.1', label: 'Mixtral 8x7B Instruct', provider: 'Together', maxTokenAllowed: 8192, },
     ],
     getApiKeyLink: 'https://api.together.xyz/settings/api-keys',
   },

@@ -1,8 +1,9 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS } from '~/lib/.server/llm/constants';
-import { CONTINUE_PROMPT } from '~/lib/.server/llm/prompts';
+import { CONTINUE_PROMPT } from '~/lib/common/prompts';
 import { streamText, type Messages, type StreamingOptions } from '~/lib/.server/llm/stream-text';
 import SwitchableStream from '~/lib/.server/llm/switchable-stream';
+import type { FilterRequestObject } from '~/lib/hooks/useFilters';
 
 export async function action(args: ActionFunctionArgs) {
   return chatAction(args);
@@ -29,9 +30,10 @@ function parseCookies(cookieHeader: string) {
 }
 
 async function chatAction({ context, request }: ActionFunctionArgs) {
-  const { messages } = await request.json<{
+  const { messages, filterReqObject } = await request.json<{
     messages: Messages;
     model: string;
+    filterReqObject: FilterRequestObject;
   }>();
 
   const cookieHeader = request.headers.get('Cookie');
@@ -60,13 +62,13 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         messages.push({ role: 'assistant', content });
         messages.push({ role: 'user', content: CONTINUE_PROMPT });
 
-        const result = await streamText(messages, context.cloudflare.env, options, apiKeys);
+        const result = await streamText(messages, context.cloudflare.env, options, apiKeys, filterReqObject);
 
         return stream.switchSource(result.toAIStream());
       },
     };
 
-    const result = await streamText(messages, context.cloudflare.env, options, apiKeys);
+    const result = await streamText(messages, context.cloudflare.env, options, apiKeys, filterReqObject);
 
     stream.switchSource(result.toAIStream());
 

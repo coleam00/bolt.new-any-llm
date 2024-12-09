@@ -3,14 +3,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
-import { SettingsWindow } from '~/components/settings/SettingsWindow';
+import { SettingsWindow } from '~/components/settings/SettingsWindow.client';
 import { SettingsButton } from '~/components/ui/SettingsButton';
-import { db, deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
+import { deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
 import { cubicEasingFn } from '~/utils/easings';
 import { logger } from '~/utils/logger';
 import { HistoryItem } from './HistoryItem';
 import { binDates } from './date-binning';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
+import { useIndexedDB } from '~/lib/providers/IndexedDBProvider.client';
+import { ClientOnly } from 'remix-utils/client-only';
 
 const menuVariants = {
   closed: {
@@ -37,6 +39,7 @@ type DialogContent = { type: 'delete'; item: ChatHistoryItem } | null;
 
 export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
+  const { db } = useIndexedDB();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
   const [open, setOpen] = useState(false);
@@ -208,7 +211,7 @@ export const Menu = () => {
           <ThemeSwitch />
         </div>
       </div>
-      <SettingsWindow open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <ClientOnly>{() => <SettingsWindow open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />}</ClientOnly>
     </motion.div>
   );
 };

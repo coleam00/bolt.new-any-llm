@@ -4,10 +4,11 @@ import { classNames } from '~/utils/classNames';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
 import { useLocation } from '@remix-run/react';
-import { db, chatId } from '~/lib/persistence/useChatHistory';
+import { chatId } from '~/lib/persistence/useChatHistory';
 import { forkChat } from '~/lib/persistence/db';
 import { toast } from 'react-toastify';
 import WithTooltip from '~/components/ui/Tooltip';
+import { useIndexedDB } from '~/lib/providers/IndexedDBProvider.client';
 
 interface MessagesProps {
   id?: string;
@@ -19,6 +20,7 @@ interface MessagesProps {
 export const Messages = React.forwardRef<HTMLDivElement, MessagesProps>((props: MessagesProps, ref) => {
   const { id, isStreaming = false, messages = [] } = props;
   const location = useLocation();
+  const { db } = useIndexedDB();
 
   const handleRewind = (messageId: string) => {
     const searchParams = new URLSearchParams(location.search);

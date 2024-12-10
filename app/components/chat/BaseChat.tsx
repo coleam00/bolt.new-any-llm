@@ -107,6 +107,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
     const [transcript, setTranscript] = useState('');
+    const [placeholder, setPlaceholder] = useState('');
+    const fullPlaceholder = "How can Bolt help you today?";
 
     // Load enabled providers from cookies
     const [enabledProviders, setEnabledProviders] = useState(() => {
@@ -200,6 +202,20 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
         setRecognition(recognition);
       }
+    }, []);
+
+    useEffect(() => {
+      let index = 0;
+      const typingInterval = setInterval(() => {
+        if (index < fullPlaceholder.length) {
+          setPlaceholder((prev) => prev + fullPlaceholder[index]);
+          index++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 100); // Adjust typing speed here
+
+      return () => clearInterval(typingInterval);
     }, []);
 
     const startListening = () => {
@@ -468,7 +484,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       minHeight: TEXTAREA_MIN_HEIGHT,
                       maxHeight: TEXTAREA_MAX_HEIGHT,
                     }}
-                    placeholder="How can Bolt help you today?"
+                    placeholder={placeholder}
                     translate="no"
                   />
                   <ClientOnly>

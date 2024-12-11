@@ -2,7 +2,7 @@ import { acceptCompletion, autocompletion, closeBrackets } from '@codemirror/aut
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, foldGutter, indentOnInput, indentUnit } from '@codemirror/language';
 import { searchKeymap } from '@codemirror/search';
-import { Compartment, EditorSelection, EditorState, StateEffect, StateField, type Extension } from '@codemirror/state';
+import { Compartment, EditorSelection, EditorState, StateEffect, StateField, type Extension, Transaction } from '@codemirror/state';
 import {
   drawSelection,
   dropCursor,
@@ -80,7 +80,7 @@ const readOnlyTooltipStateEffect = StateEffect.define<boolean>();
 
 const editableTooltipField = StateField.define<readonly Tooltip[]>({
   create: () => [],
-  update(_tooltips, transaction) {
+  update(_tooltips: readonly Tooltip[], transaction: Transaction) {
     if (!transaction.state.readOnly) {
       return [];
     }
@@ -93,8 +93,8 @@ const editableTooltipField = StateField.define<readonly Tooltip[]>({
 
     return [];
   },
-  provide: (field) => {
-    return showTooltip.computeN([field], (state) => state.field(field));
+  provide: (field: StateField<readonly Tooltip[]>) => {
+    return showTooltip.computeN([field], (state: EditorState) => state.field(field));
   },
 });
 
@@ -104,13 +104,12 @@ const editableStateField = StateField.define<boolean>({
   create() {
     return true;
   },
-  update(value, transaction) {
+  update(value: boolean, transaction: Transaction) {
     for (const effect of transaction.effects) {
       if (effect.is(editableStateEffect)) {
         return effect.value;
       }
     }
-
     return value;
   },
 });
@@ -381,14 +380,32 @@ function setEditorDocument(
   autoFocus: boolean,
   doc: TextEditorDocument,
 ) {
-  if (doc.value !== view.state.doc.toString()) {
+  const currentContent = view.state.doc.toString();
+  const newContent = doc.value;
+  
+  if (newContent !== currentContent) {
+    let startPos = 0;
+    while (startPos < currentContent.length && 
+           startPos < newContent.length && 
+           currentContent[startPos] === newContent[startPos]) {
+      startPos++;
+    }
+    
+    let endPosOld = currentContent.length;
+    let endPosNew = newContent.length;
+    while (endPosOld > startPos && 
+           endPosNew > startPos && 
+           currentContent[endPosOld - 1] === newContent[endPosNew - 1]) {
+      endPosOld--;
+      endPosNew--;
+    }
+    
     view.dispatch({
-      selection: { anchor: 0 },
       changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: doc.value,
-      },
+        from: startPos,
+        to: endPosOld,
+        insert: newContent.slice(startPos, endPosNew)
+      }
     });
   }
 
@@ -415,7 +432,6 @@ function setEditorDocument(
 
       if (autoFocus && editable) {
         if (needsScrolling) {
-          // we have to wait until the scroll position was changed before we can set the focus
           view.scrollDOM.addEventListener(
             'scroll',
             () => {
@@ -424,7 +440,6 @@ function setEditorDocument(
             { once: true },
           );
         } else {
-          // if the scroll position is still the same we can focus immediately
           view.focus();
         }
       }

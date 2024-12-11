@@ -6,6 +6,8 @@ import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
 import { createHead } from 'remix-island';
 import { useEffect } from 'react';
+import { initApiKeysStore } from './lib/stores/apiKeys';
+import { toast } from 'react-toastify';
 
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
@@ -67,6 +69,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.querySelector('html')?.setAttribute('data-theme', theme);
+    
+    const initStore = async () => {
+      try {
+        await initApiKeysStore();
+      } catch (error) {
+        console.error('Failed to initialize API keys store:', error);
+        toast.error('Failed to initialize API keys storage. Your API keys will not be saved between sessions.');
+      }
+    };
+    
+    initStore();
   }, [theme]);
 
   return (

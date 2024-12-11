@@ -16,18 +16,17 @@ export async function encrypt(key: string, data: string) {
   );
 
   const bundle = new Uint8Array(IV_LENGTH + ciphertext.byteLength);
-
   bundle.set(new Uint8Array(ciphertext));
   bundle.set(iv, ciphertext.byteLength);
 
-  return decodeBase64(bundle);
+  return arrayBufferToBase64(bundle);
 }
 
 export async function decrypt(key: string, payload: string) {
-  const bundle = encodeBase64(payload);
-
-  const iv = new Uint8Array(bundle.buffer, bundle.byteLength - IV_LENGTH);
-  const ciphertext = new Uint8Array(bundle.buffer, 0, bundle.byteLength - IV_LENGTH);
+  const bundle = base64ToArrayBuffer(payload);
+  
+  const iv = new Uint8Array(bundle.slice(bundle.byteLength - IV_LENGTH));
+  const ciphertext = new Uint8Array(bundle.slice(0, bundle.byteLength - IV_LENGTH));
 
   const cryptoKey = await getKey(key);
 
@@ -44,15 +43,24 @@ export async function decrypt(key: string, payload: string) {
 }
 
 async function getKey(key: string) {
-  return await crypto.subtle.importKey('raw', encodeBase64(key), { name: 'AES-CBC' }, false, ['encrypt', 'decrypt']);
+  const keyData = encoder.encode(key.padEnd(32, '0')).slice(0, 32);
+  return await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'AES-CBC' },
+    false,
+    ['encrypt', 'decrypt']
+  );
 }
 
-function decodeBase64(encoded: Uint8Array) {
-  const byteChars = Array.from(encoded, (byte) => String.fromCodePoint(byte));
-
-  return btoa(byteChars.join(''));
+function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
+  const bytes = new Uint8Array(buffer);
+  const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+  return btoa(binString);
 }
 
-function encodeBase64(data: string) {
-  return Uint8Array.from(atob(data), (ch) => ch.codePointAt(0)!);
+function base64ToArrayBuffer(base64: string): ArrayBuffer {
+  const binString = atob(base64);
+  const bytes = Uint8Array.from(binString, (char) => char.charCodeAt(0));
+  return bytes.buffer;
 }

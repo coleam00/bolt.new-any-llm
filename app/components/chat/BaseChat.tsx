@@ -26,6 +26,7 @@ import GitCloneButton from './GitCloneButton';
 import FilePreview from './FilePreview';
 import { ModelSelector } from '~/components/chat/ModelSelector';
 import { SpeechRecognitionButton } from '~/components/chat/SpeechRecognition';
+import { getProvidersInitialState } from '~/components/settings/getProvidersInitialState';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -109,24 +110,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [transcript, setTranscript] = useState('');
 
     // Load enabled providers from cookies
-    const [enabledProviders, setEnabledProviders] = useState(() => {
-      const savedProviders = Cookies.get('providers');
-
-      if (savedProviders) {
-        try {
-          const parsedProviders = JSON.parse(savedProviders);
-          return PROVIDER_LIST.filter((p) => parsedProviders[p.name]);
-        } catch (error) {
-          console.error('Failed to parse providers from cookies:', error);
-          return PROVIDER_LIST;
-        }
-      }
-
-      return PROVIDER_LIST;
-    });
+    const [enabledProviders, setEnabledProviders] = useState(getProvidersInitialState(PROVIDER_LIST));
 
     // Update enabled providers when cookies change
     useEffect(() => {
+
       const updateProvidersFromCookies = () => {
         const savedProviders = Cookies.get('providers');
 

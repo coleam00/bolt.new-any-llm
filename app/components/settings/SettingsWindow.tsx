@@ -12,6 +12,7 @@ import commit from '~/commit.json';
 import Cookies from 'js-cookie';
 import styles from './Settings.module.scss';
 import { Switch } from '~/components/ui/Switch';
+import { getProvidersInitialState } from '~/components/settings/getProvidersInitialState';
 
 interface SettingsProps {
   open: boolean;
@@ -81,25 +82,7 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
   ];
 
   // Load providers from cookies on mount
-  const [providers, setProviders] = useState(() => {
-    const savedProviders = Cookies.get('providers');
-
-    if (savedProviders) {
-      try {
-        const parsedProviders = JSON.parse(savedProviders);
-
-        // Merge saved enabled states with the base provider list
-        return providersList.map((provider) => ({
-          ...provider,
-          isEnabled: parsedProviders[provider.name] || false,
-        }));
-      } catch (error) {
-        console.error('Failed to parse providers from cookies:', error);
-      }
-    }
-
-    return providersList;
-  });
+  const [providers, setProviders] = useState(getProvidersInitialState(providersList));
 
   const handleToggleProvider = (providerName: string, enabled: boolean) => {
     setProviders((prevProviders) => {

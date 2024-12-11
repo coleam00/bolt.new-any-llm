@@ -2,6 +2,7 @@ import type { ProviderInfo } from '~/types/model';
 import type { ModelInfo } from '~/utils/types';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
+import { getProvidersInitialState } from '~/components/settings/getProvidersInitialState';
 
 interface ModelSelectorProps {
   model?: string;
@@ -22,21 +23,7 @@ export const ModelSelector = ({
   providerList,
 }: ModelSelectorProps) => {
   // Load enabled providers from cookies
-  const [enabledProviders, setEnabledProviders] = useState(() => {
-    const savedProviders = Cookies.get('providers');
-
-    if (savedProviders) {
-      try {
-        const parsedProviders = JSON.parse(savedProviders);
-        return providerList.filter((p) => parsedProviders[p.name]);
-      } catch (error) {
-        console.error('Failed to parse providers from cookies:', error);
-        return providerList;
-      }
-    }
-
-    return providerList;
-  });
+  const [enabledProviders, setEnabledProviders] = useState(getProvidersInitialState(providerList));
 
   // Update enabled providers when cookies change
   useEffect(() => {

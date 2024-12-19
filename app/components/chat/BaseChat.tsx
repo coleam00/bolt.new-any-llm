@@ -160,6 +160,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       }
 
       initializeModelList({ apiKeys: parsedApiKeys, providerSettings }).then((modelList) => {
+        console.log('Model List: ', modelList);
         setModelList(modelList);
       });
 
@@ -359,7 +360,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       modelList={modelList}
                       provider={provider}
                       setProvider={setProvider}
-                      providerList={providerList || PROVIDER_LIST}
+                      providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
                       apiKeys={apiKeys}
                     />
                     {(providerList || []).length > 0 && provider && (

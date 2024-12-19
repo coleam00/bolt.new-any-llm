@@ -1,5 +1,4 @@
 import { convertToCoreMessages, streamText as _streamText } from 'ai';
-import { getModel } from '~/lib/.server/llm/model';
 import { MAX_TOKENS } from './constants';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
 import {
@@ -8,6 +7,7 @@ import {
   getModelList,
   MODEL_REGEX,
   MODIFICATIONS_TAG_NAME,
+  PROVIDER_LIST,
   PROVIDER_REGEX,
   WORK_DIR,
 } from '~/utils/constants';
@@ -184,6 +184,8 @@ export async function streamText(props: {
 
   const dynamicMaxTokens = modelDetails && modelDetails.maxTokenAllowed ? modelDetails.maxTokenAllowed : MAX_TOKENS;
 
+  const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
+
   let systemPrompt =
     PromptLibrary.getPropmtFromLibrary(promptId || 'default', {
       cwd: WORK_DIR,
@@ -199,7 +201,12 @@ export async function streamText(props: {
   }
 
   return _streamText({
-    model: getModel(currentProvider, currentModel, serverEnv, apiKeys, providerSettings) as any,
+    model: provider.getModelInstance({
+      model: currentModel,
+      serverEnv,
+      apiKeys,
+      providerSettings,
+    }),
     system: systemPrompt,
     maxTokens: dynamicMaxTokens,
     messages: convertToCoreMessages(processedMessages as any),

@@ -438,7 +438,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
+                        // Prevent sending message when shift key is pressed
                         if (event.shiftKey) {
+                          return;
+                        }
+
+                        /*
+                         * Prevent sending message when IME composition is in progress
+                         * keyCode 229 is a special code for IME composition with some browsers like MacOS Safari
+                         */
+                        if (event.nativeEvent.isComposing || event.keyCode === 229) {
                           return;
                         }
 

@@ -1,11 +1,25 @@
 {
-  "name": "bolt",
+  "name": "bolt-diy",
   "description": "An AI Agent",
   "private": true,
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
   "version": "0.0.3",
+  "bin": {
+    "bolt.diy": "bin/bolt.js"
+  },
+  "files": [
+    "bin/",
+    "app/",
+    "public/",
+    "build/",
+    "functions/",
+    "pre-start.cjs",
+    "vite.config.ts",
+    "remix.config.js",
+    "uno.config.ts"
+  ],
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy",
     "build": "remix vite:build",

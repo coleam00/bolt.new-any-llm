@@ -95,6 +95,16 @@ export class StreamingMessageParser {
             let content = currentAction.content.trim();
 
             if ('type' in currentAction && currentAction.type === 'file') {
+              // Remove markdown code block syntax if present and file is not markdown
+              if (!currentAction.filePath.endsWith('.md')) {
+                const codeBlockRegex = /^\s*```\w*\n([\s\S]*?)\n\s*```\s*$/;
+                const match = content.match(codeBlockRegex);
+
+                if (match) {
+                  content = match[1].replace(/^[ ]{4}/gm, '').trim(); // Remove common leading 4-space indent
+                }
+              }
+
               content += '\n';
             }
 

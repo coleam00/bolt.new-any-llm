@@ -2,6 +2,31 @@ import type { Message } from 'ai';
 import { toast } from 'react-toastify';
 import { ImportFolderButton } from '~/components/chat/ImportFolderButton';
 
+const processChatData = (data: any): { description: string; messages: Message[] }[] => {
+  // Handle Bolt standard format
+  if (data.messages && Array.isArray(data.messages)) {
+    return [{ description: data.description || 'Imported Chat', messages: data.messages }];
+  }
+  
+  // Handle Chrome extension format
+  if (data.boltHistory?.chats) {
+    return Object.values(data.boltHistory.chats).map((chat: any) => ({
+      description: chat.description || 'Imported Chat',
+      messages: chat.messages
+    }));
+  }
+
+  // Handle history array format
+  if (data.history && Array.isArray(data.history)) {
+    return data.history.map((chat: any) => ({
+      description: chat.description || 'Imported Chat',
+      messages: chat.messages
+    }));
+  }
+
+  throw new Error('Unsupported chat format');
+};
+
 export function ImportButtons(importChat: ((description: string, messages: Message[]) => Promise<void>) | undefined) {
   return (
     <div className="flex flex-col items-center justify-center w-auto">
@@ -21,13 +46,13 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
                 try {
                   const content = e.target?.result as string;
                   const data = JSON.parse(content);
-
-                  if (!Array.isArray(data.messages)) {
-                    toast.error('Invalid chat file format');
+                  const chats = processChatData(data);
+                  
+                  for (const chat of chats) {
+                    await importChat(chat.description, chat.messages);
                   }
-
-                  await importChat(data.description, data.messages);
-                  toast.success('Chat imported successfully');
+                  
+                  toast.success(`Successfully imported ${chats.length} chat${chats.length > 1 ? 's' : ''}`);
                 } catch (error: unknown) {
                   if (error instanceof Error) {
                     toast.error('Failed to parse chat file: ' + error.message);

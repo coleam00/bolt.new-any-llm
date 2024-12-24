@@ -26,8 +26,14 @@ export function HistoryItem({ item, onDelete, onDuplicate, exportChat }: History
 
   const renderDescriptionForm = (
     <form onSubmit={handleSubmit} className="flex-1 flex items-center">
+      <label htmlFor="chat-description" className="sr-only">
+        Edit chat description
+      </label>
       <input
+        id="chat-description"
         type="text"
+        placeholder="Enter chat description"
+        aria-label="Edit chat description"
         className="flex-1 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary rounded px-2 mr-2"
         autoFocus
         value={currentDescription}
@@ -37,6 +43,7 @@ export function HistoryItem({ item, onDelete, onDuplicate, exportChat }: History
       />
       <button
         type="submit"
+        aria-label="Save description"
         className="i-ph:check scale-110 hover:text-bolt-elements-item-contentAccent"
         onMouseDown={handleSubmit}
       />
@@ -125,6 +132,7 @@ const ChatActionButton = forwardRef(
         <button
           ref={ref}
           type="button"
+          aria-label={toolTipContent}
           className={`scale-110 mr-2 hover:text-bolt-elements-item-contentAccent ${icon} ${className ? className : ''}`}
           onClick={onClick}
         />

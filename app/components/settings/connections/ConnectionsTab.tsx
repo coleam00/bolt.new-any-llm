@@ -95,20 +95,28 @@ export default function ConnectionsTab() {
       <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">GitHub Connection</h3>
       <div className="flex mb-4">
         <div className="flex-1 mr-2">
-          <label className="block text-sm text-bolt-elements-textSecondary mb-1">GitHub Username:</label>
+          <label htmlFor="github-username" className="block text-sm text-bolt-elements-textSecondary mb-1">
+            GitHub Username:
+          </label>
           <input
+            id="github-username"
             type="text"
             value={githubUsername}
+            placeholder="Enter GitHub username"
             onChange={(e) => setGithubUsername(e.target.value)}
             disabled={isVerifying}
             className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor disabled:opacity-50"
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm text-bolt-elements-textSecondary mb-1">Personal Access Token:</label>
+          <label htmlFor="github-token" className="block text-sm text-bolt-elements-textSecondary mb-1">
+            Personal Access Token:
+          </label>
           <input
+            id="github-token"
             type="password"
             value={githubToken}
+            placeholder="Enter personal access token"
             onChange={(e) => setGithubToken(e.target.value)}
             disabled={isVerifying}
             className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor disabled:opacity-50"

@@ -56,6 +56,7 @@ export const ModelSelector = ({
   return (
     <div className="mb-2 flex gap-2 flex-col sm:flex-row">
       <select
+        aria-label="Select AI Provider"
         value={provider?.name ?? ''}
         onChange={(e) => {
           const newProvider = providerList.find((p: ProviderInfo) => p.name === e.target.value);
@@ -79,6 +80,7 @@ export const ModelSelector = ({
         ))}
       </select>
       <select
+        aria-label="Select AI Model"
         key={provider?.name}
         value={model}
         onChange={(e) => setModel?.(e.target.value)}

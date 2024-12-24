@@ -53,7 +53,12 @@ export function Chat() {
       <ToastContainer
         closeButton={({ closeToast }) => {
           return (
-            <button className="Toastify__close-button" onClick={closeToast}>
+            <button
+              type="button"
+              aria-label="Close notification"
+              className="Toastify__close-button"
+              onClick={closeToast}
+            >
               <div className="i-ph:x text-lg" />
             </button>
           );
@@ -143,19 +148,52 @@ export const ChatImpl = memo(
         promptId,
       },
       sendExtraMessageFields: true,
-      onError: (error) => {
+      headers: {
+        Accept: 'text/event-stream',
+      },
+      onError: async (error: Error & { response?: Response }) => {
         logger.error('Request failed\n\n', error);
-        toast.error(
-          'There was an error processing your request: ' + (error.message ? error.message : 'No details were returned'),
-        );
+
+        let errorMessage = 'An unknown error occurred';
+
+        try {
+          if (error.response) {
+            const response = (await error.response.json()) as {
+              error?: string;
+              details?: string;
+              provider?: string;
+              model?: string;
+            };
+
+            if (response?.error) {
+              errorMessage = response.error;
+
+              if (response.details) {
+                logger.error('Error details:', response.details);
+              }
+
+              if (response.provider) {
+                logger.error('Provider:', response.provider);
+              }
+
+              if (response.model) {
+                logger.error('Model:', response.model);
+              }
+            }
+          }
+        } catch (e) {
+          logger.error('Error parsing error response:', e);
+          errorMessage = error.message || 'An unknown error occurred';
+        }
+
+        toast.error(errorMessage);
+        stop();
       },
       onFinish: (message, response) => {
         const usage = response.usage;
 
         if (usage) {
           console.log('Token usage:', usage);
-
-          // You can now use the usage data as needed
         }
 
         logger.debug('Finished streaming');

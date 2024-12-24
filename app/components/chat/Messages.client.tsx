@@ -76,6 +76,8 @@ export const Messages = React.forwardRef<HTMLDivElement, MessagesProps>((props: 
                     {messageId && (
                       <WithTooltip tooltip="Revert to this message">
                         <button
+                          type="button"
+                          aria-label="Revert to this message"
                           onClick={() => handleRewind(messageId)}
                           key="i-ph:arrow-u-up-left"
                           className={classNames(
@@ -88,6 +90,8 @@ export const Messages = React.forwardRef<HTMLDivElement, MessagesProps>((props: 
 
                     <WithTooltip tooltip="Fork chat from this message">
                       <button
+                        type="button"
+                        aria-label="Fork chat from this message"
                         onClick={() => handleFork(messageId)}
                         key="i-ph:git-fork"
                         className={classNames(

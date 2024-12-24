@@ -26,7 +26,12 @@ export default class SwitchableStream extends TransformStream {
 
     this._currentReader = newStream.getReader();
 
-    this._pumpStream();
+    try {
+      await this._pumpStream();
+    } catch (error) {
+      console.error('Error switching stream source:', error);
+      throw error instanceof Error ? error : new Error(String(error));
+    }
 
     this._switches++;
   }
@@ -44,11 +49,35 @@ export default class SwitchableStream extends TransformStream {
           break;
         }
 
-        this._controller.enqueue(value);
+        // Handle different types of chunks that might come from different providers
+        if (value instanceof Uint8Array) {
+          // Handle binary data
+          this._controller.enqueue(value);
+        } else if (typeof value === 'string') {
+          // Handle string data
+          this._controller.enqueue(new TextEncoder().encode(value));
+        } else if (value && typeof value === 'object') {
+          // Handle structured data (like from Azure OpenAI)
+          try {
+            const chunk = JSON.stringify(value);
+            this._controller.enqueue(new TextEncoder().encode(chunk + '\n'));
+          } catch (e) {
+            console.error('Error stringifying chunk:', e);
+            this._controller.enqueue(new TextEncoder().encode(String(value)));
+          }
+        } else {
+          // Handle any other type by converting to string
+          this._controller.enqueue(new TextEncoder().encode(String(value)));
+        }
       }
     } catch (error) {
-      console.log(error);
-      this._controller.error(error);
+      console.error('Error pumping stream:', error);
+
+      if (this._controller) {
+        this._controller.error(error instanceof Error ? error : new Error(String(error)));
+      }
+
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 

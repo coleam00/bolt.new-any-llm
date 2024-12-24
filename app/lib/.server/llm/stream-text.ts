@@ -153,63 +153,69 @@ export async function streamText(props: {
 }) {
   const { messages, env: serverEnv, options, apiKeys, files, providerSettings, promptId } = props;
 
-  // console.log({serverEnv});
+  try {
+    let currentModel = DEFAULT_MODEL;
+    let currentProvider = DEFAULT_PROVIDER.name;
+    const MODEL_LIST = await getModelList({ apiKeys, providerSettings, serverEnv: serverEnv as any });
+    const processedMessages = messages.map((message) => {
+      if (message.role === 'user') {
+        const { model, provider, content } = extractPropertiesFromMessage(message);
 
-  let currentModel = DEFAULT_MODEL;
-  let currentProvider = DEFAULT_PROVIDER.name;
-  const MODEL_LIST = await getModelList({ apiKeys, providerSettings, serverEnv: serverEnv as any });
-  const processedMessages = messages.map((message) => {
-    if (message.role === 'user') {
-      const { model, provider, content } = extractPropertiesFromMessage(message);
+        if (MODEL_LIST.find((m) => m.name === model)) {
+          currentModel = model;
+        }
 
-      if (MODEL_LIST.find((m) => m.name === model)) {
-        currentModel = model;
+        currentProvider = provider;
+
+        return { ...message, content };
+      } else if (message.role == 'assistant') {
+        const content = message.content;
+        return { ...message, content };
       }
 
-      currentProvider = provider;
+      return message;
+    });
 
-      return { ...message, content };
-    } else if (message.role == 'assistant') {
-      const content = message.content;
+    const modelDetails = MODEL_LIST.find((m) => m.name === currentModel);
+    const dynamicMaxTokens = modelDetails && modelDetails.maxTokenAllowed ? modelDetails.maxTokenAllowed : MAX_TOKENS;
+    const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
 
-      // content = simplifyBoltActions(content);
+    let systemPrompt =
+      PromptLibrary.getPropmtFromLibrary(promptId || 'default', {
+        cwd: WORK_DIR,
+        allowedHtmlElements: allowedHTMLElements,
+        modificationTagName: MODIFICATIONS_TAG_NAME,
+      }) ?? getSystemPrompt();
 
-      return { ...message, content };
+    let codeContext = '';
+
+    if (files) {
+      codeContext = createFilesContext(files);
+      codeContext = '';
+      systemPrompt = `${systemPrompt}\n\n ${codeContext}`;
     }
 
-    return message;
-  });
+    try {
+      const modelInstance = provider.getModelInstance({
+        model: currentModel,
+        serverEnv,
+        apiKeys,
+        providerSettings,
+      });
 
-  const modelDetails = MODEL_LIST.find((m) => m.name === currentModel);
-
-  const dynamicMaxTokens = modelDetails && modelDetails.maxTokenAllowed ? modelDetails.maxTokenAllowed : MAX_TOKENS;
-
-  const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
-
-  let systemPrompt =
-    PromptLibrary.getPropmtFromLibrary(promptId || 'default', {
-      cwd: WORK_DIR,
-      allowedHtmlElements: allowedHTMLElements,
-      modificationTagName: MODIFICATIONS_TAG_NAME,
-    }) ?? getSystemPrompt();
-  let codeContext = '';
-
-  if (files) {
-    codeContext = createFilesContext(files);
-    codeContext = '';
-    systemPrompt = `${systemPrompt}\n\n ${codeContext}`;
+      return _streamText({
+        model: modelInstance,
+        system: systemPrompt,
+        maxTokens: dynamicMaxTokens,
+        messages: convertToCoreMessages(processedMessages as any),
+        ...options,
+      });
+    } catch (error) {
+      console.error('Error creating model instance:', error);
+      throw error instanceof Error ? error : new Error(String(error));
+    }
+  } catch (error) {
+    console.error('Error in streamText:', error);
+    throw error instanceof Error ? error : new Error(String(error));
   }
-
-  return _streamText({
-    model: provider.getModelInstance({
-      model: currentModel,
-      serverEnv,
-      apiKeys,
-      providerSettings,
-    }),
-    system: systemPrompt,
-    maxTokens: dynamicMaxTokens,
-    messages: convertToCoreMessages(processedMessages as any),
-    ...options,
-  });
 }

@@ -5,11 +5,15 @@ import { ImportFolderButton } from '~/components/chat/ImportFolderButton';
 export function ImportButtons(importChat: ((description: string, messages: Message[]) => Promise<void>) | undefined) {
   return (
     <div className="flex flex-col items-center justify-center w-auto">
+      <label htmlFor="chat-import" className="sr-only">
+        Import chat file
+      </label>
       <input
         type="file"
         id="chat-import"
         className="hidden"
         accept=".json"
+        aria-label="Import chat file"
         onChange={async (e) => {
           const file = e.target.files?.[0];
 

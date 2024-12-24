@@ -1,5 +1,5 @@
 import type { Message } from 'ai';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { classNames } from '~/utils/classNames';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
@@ -44,10 +44,15 @@ export const Messages = React.forwardRef<HTMLDivElement, MessagesProps>((props: 
     <div id={id} ref={ref} className={props.className}>
       {messages.length > 0
         ? messages.map((message, index) => {
-            const { role, content, id: messageId } = message;
+            const { role, content, id: messageId, annotations } = message;
             const isUserMessage = role === 'user';
             const isFirst = index === 0;
             const isLast = index === messages.length - 1;
+            const isHidden = annotations?.includes('hidden');
+
+            if (isHidden) {
+              return <Fragment key={index} />;
+            }
 
             return (
               <div

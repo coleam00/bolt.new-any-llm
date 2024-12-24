@@ -22,6 +22,7 @@ import { useSettings } from '~/lib/hooks/useSettings';
 import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
+import { getTemplates, selectStarterTemplate } from '~/utils/select-starter-template';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -116,6 +117,7 @@ export const ChatImpl = memo(
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Move here
     const [imageDataList, setImageDataList] = useState<string[]>([]); // Move here
     const [searchParams, setSearchParams] = useSearchParams();
+    const [fakeLoading, setFakeLoading] = useState(false);
     const files = useStore(workbenchStore.files);
     const actionAlert = useStore(workbenchStore.alert);
     const { activeProviders, promptId } = useSettings();
@@ -135,7 +137,7 @@ export const ChatImpl = memo(
 
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
 
-    const { messages, isLoading, input, handleInputChange, setInput, stop, append } = useChat({
+    const { messages, isLoading, input, handleInputChange, setInput, stop, append, setMessages, reload } = useChat({
       api: '/api/chat',
       body: {
         apiKeys,
@@ -265,6 +267,110 @@ export const ChatImpl = memo(
 
       runAnimation();
 
+      if (!chatStarted && messageInput) {
+        setFakeLoading(true);
+        setMessages([
+          {
+            id: `${new Date().getTime()}`,
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${_input}`,
+              },
+              ...imageDataList.map((imageData) => ({
+                type: 'image',
+                image: imageData,
+              })),
+            ] as any, // Type assertion to bypass compiler check
+          },
+        ]);
+
+        // reload();
+
+        const template = await selectStarterTemplate({
+          message: messageInput,
+          model,
+          provider,
+        });
+
+        if (template !== 'blank') {
+          const temResp = await getTemplates(template);
+
+          if (temResp) {
+            const { assistantMessage, userMessage } = temResp;
+
+            setMessages([
+              {
+                id: `${new Date().getTime()}`,
+                role: 'user',
+                content: messageInput,
+
+                // annotations: ['hidden'],
+              },
+              {
+                id: `${new Date().getTime()}`,
+                role: 'assistant',
+                content: assistantMessage,
+              },
+              {
+                id: `${new Date().getTime()}`,
+                role: 'user',
+                content: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userMessage}`,
+                annotations: ['hidden'],
+              },
+            ]);
+
+            reload();
+            setFakeLoading(false);
+
+            return;
+          } else {
+            setMessages([
+              {
+                id: `${new Date().getTime()}`,
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${_input}`,
+                  },
+                  ...imageDataList.map((imageData) => ({
+                    type: 'image',
+                    image: imageData,
+                  })),
+                ] as any, // Type assertion to bypass compiler check
+              },
+            ]);
+            reload();
+            setFakeLoading(false);
+
+            return;
+          }
+        } else {
+          setMessages([
+            {
+              id: `${new Date().getTime()}`,
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${_input}`,
+                },
+                ...imageDataList.map((imageData) => ({
+                  type: 'image',
+                  image: imageData,
+                })),
+              ] as any, // Type assertion to bypass compiler check
+            },
+          ]);
+          reload();
+          setFakeLoading(false);
+
+          return;
+        }
+      }
+
       if (fileModifications !== undefined) {
         /**
          * If we have file modifications we append a new user message manually since we have to prefix
@@ -367,7 +473,7 @@ export const ChatImpl = memo(
         input={input}
         showChat={showChat}
         chatStarted={chatStarted}
-        isStreaming={isLoading}
+        isStreaming={isLoading || fakeLoading}
         enhancingPrompt={enhancingPrompt}
         promptEnhanced={promptEnhanced}
         sendMessage={sendMessage}

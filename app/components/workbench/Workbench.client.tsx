@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { motion, type HTMLMotionProps, type Variants } from 'framer-motion';
 import { computed } from 'nanostores';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   type OnChangeCallback as OnEditorChange,
@@ -17,7 +17,7 @@ import { renderLogger } from '~/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
 import useViewport from '~/lib/hooks';
-import Cookies from 'js-cookie';
+import { getGitCredentials, createGitPushHandler, gitProviders } from '~/lib/git';
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -58,6 +58,10 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
   renderLogger.trace('Workbench');
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [hasCredentials, setHasCredentials] = useState<{ github: boolean; gitlab: boolean }>({
+    github: false,
+    gitlab: false,
+  });
 
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
   const showWorkbench = useStore(workbenchStore.showWorkbench);
@@ -82,6 +86,17 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
   useEffect(() => {
     workbenchStore.setDocuments(files);
   }, [files]);
+
+  useEffect(() => {
+    const initCredentials = async () => {
+      const credentials = await getGitCredentials();
+      setHasCredentials({
+        github: credentials.github || false,
+        gitlab: credentials.gitlab || false,
+      });
+    };
+    initCredentials();
+  }, []);
 
   const onEditorChange = useCallback<OnEditorChange>((update) => {
     workbenchStore.setCurrentDocumentContent(update.content);
@@ -119,6 +134,26 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
       setIsSyncing(false);
     }
   }, []);
+
+  const cleanPath = (path: string): string => {
+    return path.replace('/home/project/', '');
+  };
+
+  const getWorkbenchFiles = useCallback(() => {
+    const docs = workbenchStore.files.get();
+    return Object.entries(docs).reduce(
+      (acc, [path, doc]) => {
+        if (doc && 'content' in doc) {
+          acc[cleanPath(path)] = (doc as { content: string }).content;
+        }
+
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+  }, []);
+
+  const pushFunctions = useMemo(() => createGitPushHandler(getWorkbenchFiles), [getWorkbenchFiles]);
 
   return (
     chatStarted && (
@@ -168,40 +203,15 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       <div className="i-ph:terminal" />
                       Toggle Terminal
                     </PanelHeaderButton>
-                    <PanelHeaderButton
-                      className="mr-1 text-sm"
-                      onClick={() => {
-                        const repoName = prompt(
-                          'Please enter a name for your new GitHub repository:',
-                          'bolt-generated-project',
-                        );
-
-                        if (!repoName) {
-                          alert('Repository name is required. Push to GitHub cancelled.');
-                          return;
-                        }
-
-                        const githubUsername = Cookies.get('githubUsername');
-                        const githubToken = Cookies.get('githubToken');
-
-                        if (!githubUsername || !githubToken) {
-                          const usernameInput = prompt('Please enter your GitHub username:');
-                          const tokenInput = prompt('Please enter your GitHub personal access token:');
-
-                          if (!usernameInput || !tokenInput) {
-                            alert('GitHub username and token are required. Push to GitHub cancelled.');
-                            return;
-                          }
-
-                          workbenchStore.pushToGitHub(repoName, usernameInput, tokenInput);
-                        } else {
-                          workbenchStore.pushToGitHub(repoName, githubUsername, githubToken);
-                        }
-                      }}
-                    >
-                      <div className="i-ph:github-logo" />
-                      Push to GitHub
-                    </PanelHeaderButton>
+                    {Object.entries(gitProviders).map(
+                      ([name, plugin]) =>
+                        hasCredentials[name as keyof typeof hasCredentials] && (
+                          <PanelHeaderButton key={name} className="mr-1 text-sm" onClick={pushFunctions[name]}>
+                            <div className={plugin.provider.icon} />
+                            Push to {plugin.provider.title}
+                          </PanelHeaderButton>
+                        ),
+                    )}
                   </div>
                 )}
                 <IconButton
@@ -245,6 +255,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
     )
   );
 });
+
 interface ViewProps extends HTMLMotionProps<'div'> {
   children: JSX.Element;
 }

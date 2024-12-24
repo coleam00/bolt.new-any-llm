@@ -1,8 +1,8 @@
 import ignore from 'ignore';
-import { useGit } from '~/lib/hooks/useGit';
 import type { Message } from 'ai';
 import { detectProjectCommands, createCommandsMessage } from '~/utils/projectCommands';
 import { generateId } from '~/utils/fileUtils';
+import { useGit } from '~/lib/git';
 
 const IGNORE_PATTERNS = [
   'node_modules/**',
